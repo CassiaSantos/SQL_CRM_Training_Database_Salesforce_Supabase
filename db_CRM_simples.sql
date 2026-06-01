@@ -1,4 +1,5 @@
--- CRIAÇÃO DAS TABELAS:
+-- CRIAÇÃO DAS TABELAS
+
 -- CLIENTES
 CREATE TABLE tb_clientes (
     id_cliente INT PRIMARY KEY,
@@ -10,7 +11,6 @@ CREATE TABLE tb_clientes (
     data_cadastro DATE
 );
 
-
 -- LEADS
 CREATE TABLE tb_leads (
     id_lead INT PRIMARY KEY,
@@ -21,14 +21,12 @@ CREATE TABLE tb_leads (
     convertido BOOLEAN
 );
 
-
 -- VENDEDORES
 CREATE TABLE tb_vendedores (
     id_vendedor INT PRIMARY KEY,
     nome VARCHAR(100),
     equipe VARCHAR(50)
 );
-
 
 -- PRODUTOS
 CREATE TABLE tb_produtos (
@@ -38,7 +36,6 @@ CREATE TABLE tb_produtos (
     preco DECIMAL(10,2)
 );
 
-
 -- VENDAS
 CREATE TABLE tb_vendas (
     id_venda INT PRIMARY KEY,
@@ -46,10 +43,13 @@ CREATE TABLE tb_vendas (
     id_vendedor INT,
     data_venda DATE,
     valor_total DECIMAL(10,2),
-    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente),
-    FOREIGN KEY (id_vendedor) REFERENCES vendedores(id_vendedor)
-);
 
+    FOREIGN KEY (id_cliente)
+        REFERENCES tb_clientes(id_cliente),
+
+    FOREIGN KEY (id_vendedor)
+        REFERENCES tb_vendedores(id_vendedor)
+);
 
 -- ITENS DA VENDA
 CREATE TABLE tb_itens_venda (
@@ -58,129 +58,142 @@ CREATE TABLE tb_itens_venda (
     id_produto INT,
     quantidade INT,
     valor_unitario DECIMAL(10,2),
-    FOREIGN KEY (id_venda) REFERENCES vendas(id_venda),
-    FOREIGN KEY (id_produto) REFERENCES produtos(id_produto)
-);
 
+    FOREIGN KEY (id_venda)
+        REFERENCES tb_vendas(id_venda),
+
+    FOREIGN KEY (id_produto)
+        REFERENCES tb_produtos(id_produto)
+);
 
 -- INTERAÇÕES
 CREATE TABLE tb_interacoes (
     id_interacao INT PRIMARY KEY,
     id_cliente INT,
-    tipo VARCHAR(50), -- email, ligação, whatsapp
+    tipo VARCHAR(50),
     data_interacao DATE,
     descricao TEXT,
-    FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
+
+    FOREIGN KEY (id_cliente)
+        REFERENCES tb_clientes(id_cliente)
 );
 
--- POVOAMENTO DO BANCO:
-INSERT INTO clientes VALUES
+----------------------------------------------------
+-- POVOAMENTO DO BANCO
+----------------------------------------------------
+
+INSERT INTO tb_clientes VALUES
 (1, 'Cássia Santos', 'cassia@email.com', '99999-1111', 'Santarém', 'PA', '2024-01-10'),
 (2, 'João Silva', 'joao@email.com', '99999-2222', 'Belém', 'PA', '2024-02-15'),
 (3, 'Maria Souza', 'maria@email.com', '99999-3333', 'Manaus', 'AM', '2024-03-20'),
 (4, 'Carlos Lima', 'carlos@email.com', '99999-4444', 'Santarém', 'PA', '2024-04-10'),
 (5, 'Ana Costa', 'ana@email.com', '99999-5555', 'Belém', 'PA', '2024-05-05');
 
-
-INSERT INTO leads VALUES
+INSERT INTO tb_leads VALUES
 (1, 'lead1@email.com', 'facebook', 'campanha1', '2024-01-01', TRUE),
 (2, 'lead2@email.com', 'google', 'campanha2', '2024-01-10', FALSE),
 (3, 'lead3@email.com', 'instagram', 'campanha3', '2024-02-01', TRUE),
 (4, 'lead4@email.com', 'indicacao', 'campanha1', '2024-02-15', TRUE);
 
-
-INSERT INTO vendedores VALUES
+INSERT INTO tb_vendedores VALUES
 (1, 'Pedro Alves', 'Time A'),
 (2, 'Juliana Rocha', 'Time B');
 
-
-INSERT INTO produtos VALUES
+INSERT INTO tb_produtos VALUES
 (1, 'CRM Básico', 'Software', 100.00),
 (2, 'CRM Pro', 'Software', 300.00),
 (3, 'Consultoria', 'Serviço', 500.00);
 
-
-INSERT INTO vendas VALUES
+INSERT INTO tb_vendas VALUES
 (1, 1, 1, '2024-06-01', 400.00),
 (2, 2, 2, '2024-06-05', 300.00),
 (3, 1, 1, '2024-07-01', 500.00),
 (4, 3, 2, '2024-07-10', 100.00);
 
-
-INSERT INTO itens_venda VALUES
+INSERT INTO tb_itens_venda VALUES
 (1, 1, 1, 2, 100.00),
 (2, 1, 2, 1, 200.00),
 (3, 2, 2, 1, 300.00),
 (4, 3, 3, 1, 500.00),
 (5, 4, 1, 1, 100.00);
 
-
-INSERT INTO interacoes VALUES
+INSERT INTO tb_interacoes VALUES
 (1, 1, 'email', '2024-06-01', 'Boas-vindas'),
 (2, 1, 'whatsapp', '2024-06-02', 'Dúvida sobre produto'),
 (3, 2, 'ligacao', '2024-06-06', 'Follow-up'),
 (4, 3, 'email', '2024-07-11', 'Promoção enviada');
 
+----------------------------------------------------
+-- CONSULTAS
+----------------------------------------------------
 
---CONSULTAS:
---Clientes sem compras:
+-- Clientes sem compras
 SELECT c.nome
-FROM clientes c
-LEFT JOIN vendas v ON c.id_cliente = v.id_cliente
+FROM tb_clientes c
+LEFT JOIN tb_vendas v
+    ON c.id_cliente = v.id_cliente
 WHERE v.id_venda IS NULL;
 
-
--- Total gasto por cliente:
-SELECT c.nome, SUM(v.valor_total) AS total
-FROM clientes c
-JOIN vendas v ON c.id_cliente = v.id_cliente
+-- Total gasto por cliente
+SELECT c.nome,
+       SUM(v.valor_total) AS total
+FROM tb_clientes c
+JOIN tb_vendas v
+    ON c.id_cliente = v.id_cliente
 GROUP BY c.nome;
 
+-- Ticket médio
+SELECT AVG(valor_total) AS ticket_medio
+FROM tb_vendas;
 
---Ticket médio
-SELECT AVG(valor_total) FROM vendas;
-
-
--- Total por categoria de produto:
-SELECT p.categoria, SUM(iv.quantidade * iv.valor_unitario) AS total
-FROM itens_venda iv
-JOIN produtos p ON iv.id_produto = p.id_produto
+-- Total por categoria de produto
+SELECT p.categoria,
+       SUM(iv.quantidade * iv.valor_unitario) AS total
+FROM tb_itens_venda iv
+JOIN tb_produtos p
+    ON iv.id_produto = p.id_produto
 GROUP BY p.categoria;
 
-
--- Top clientes:
-SELECT c.nome, SUM(v.valor_total) AS total
-FROM clientes c
-JOIN vendas v ON c.id_cliente = v.id_cliente
+-- Top clientes
+SELECT c.nome,
+       SUM(v.valor_total) AS total
+FROM tb_clientes c
+JOIN tb_vendas v
+    ON c.id_cliente = v.id_cliente
 GROUP BY c.nome
 ORDER BY total DESC
 LIMIT 3;
 
-
--- Clientes que não compram DESDE JULHO DE 2024:
-SELECT c.nome, MAX(v.data_venda) AS ultima_compra
-FROM clientes c
-JOIN vendas v ON c.id_cliente = v.id_cliente
+-- Clientes que não compram desde julho de 2024
+SELECT c.nome,
+       MAX(v.data_venda) AS ultima_compra
+FROM tb_clientes c
+JOIN tb_vendas v
+    ON c.id_cliente = v.id_cliente
 GROUP BY c.nome
 HAVING MAX(v.data_venda) < '2024-07-01';
 
-
 -- Origem de leads que mais converte
-SELECT origem, COUNT(*) AS total
-FROM leads
+SELECT origem,
+       COUNT(*) AS total
+FROM tb_leads
 WHERE convertido = TRUE
 GROUP BY origem;
 
-
 -- Clientes com muitas interações
-SELECT c.nome, COUNT(i.id_interacao) AS total_interacoes
-FROM clientes c
-JOIN interacoes i ON c.id_cliente = i.id_cliente
+SELECT c.nome,
+       COUNT(i.id_interacao) AS total_interacoes
+FROM tb_clientes c
+JOIN tb_interacoes i
+    ON c.id_cliente = i.id_cliente
 GROUP BY c.nome
 HAVING COUNT(i.id_interacao) > 1;
 
-
--- Taxa de conversão de leads:
+-- Taxa de conversão de leads
 SELECT
-    COUNT(CASE WHEN convertido = TRUE THEN 1 END) * 1.0 / COUNT(*) AS taxa
-FROM leads;
+    COUNT(
+        CASE
+            WHEN convertido = TRUE THEN 1
+        END
+    ) * 1.0 / COUNT(*) AS taxa
+FROM tb_leads;
