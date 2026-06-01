@@ -1,3 +1,4 @@
+-- CRIAÇÃO DAS TABELAS:
 -- CLIENTES
 CREATE TABLE tb_clientes (
     id_cliente INT PRIMARY KEY,
@@ -71,3 +72,51 @@ CREATE TABLE tb_interacoes (
     descricao TEXT,
     FOREIGN KEY (id_cliente) REFERENCES clientes(id_cliente)
 );
+
+-- POVOAMENTO DO BANCO:
+INSERT INTO clientes VALUES
+(1, 'Cássia Santos', 'cassia@email.com', '99999-1111', 'Santarém', 'PA', '2024-01-10'),
+(2, 'João Silva', 'joao@email.com', '99999-2222', 'Belém', 'PA', '2024-02-15'),
+(3, 'Maria Souza', 'maria@email.com', '99999-3333', 'Manaus', 'AM', '2024-03-20'),
+(4, 'Carlos Lima', 'carlos@email.com', '99999-4444', 'Santarém', 'PA', '2024-04-10'),
+(5, 'Ana Costa', 'ana@email.com', '99999-5555', 'Belém', 'PA', '2024-05-05');
+
+
+INSERT INTO leads VALUES
+(1, 'lead1@email.com', 'facebook', 'campanha1', '2024-01-01', TRUE),
+(2, 'lead2@email.com', 'google', 'campanha2', '2024-01-10', FALSE),
+(3, 'lead3@email.com', 'instagram', 'campanha3', '2024-02-01', TRUE),
+(4, 'lead4@email.com', 'indicacao', 'campanha1', '2024-02-15', TRUE);
+
+
+INSERT INTO vendedores VALUES
+(1, 'Pedro Alves', 'Time A'),
+(2, 'Juliana Rocha', 'Time B');
+
+
+INSERT INTO produtos VALUES
+(1, 'CRM Básico', 'Software', 100.00),
+(2, 'CRM Pro', 'Software', 300.00),
+(3, 'Consultoria', 'Serviço', 500.00);
+
+
+INSERT INTO vendas VALUES
+(1, 1, 1, '2024-06-01', 400.00),
+(2, 2, 2, '2024-06-05', 300.00),
+(3, 1, 1, '2024-07-01', 500.00),
+(4, 3, 2, '2024-07-10', 100.00);
+
+
+INSERT INTO itens_venda VALUES
+(1, 1, 1, 2, 100.00),
+(2, 1, 2, 1, 200.00),
+(3, 2, 2, 1, 300.00),
+(4, 3, 3, 1, 500.00),
+(5, 4, 1, 1, 100.00);
+
+
+INSERT INTO interacoes VALUES
+(1, 1, 'email', '2024-06-01', 'Boas-vindas'),
+(2, 1, 'whatsapp', '2024-06-02', 'Dúvida sobre produto'),
+(3, 2, 'ligacao', '2024-06-06', 'Follow-up'),
+(4, 3, 'email', '2024-07-11', 'Promoção enviada');
