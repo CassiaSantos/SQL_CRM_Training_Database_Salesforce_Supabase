@@ -120,3 +120,67 @@ INSERT INTO interacoes VALUES
 (2, 1, 'whatsapp', '2024-06-02', 'Dúvida sobre produto'),
 (3, 2, 'ligacao', '2024-06-06', 'Follow-up'),
 (4, 3, 'email', '2024-07-11', 'Promoção enviada');
+
+
+--CONSULTAS:
+--Clientes sem compras:
+SELECT c.nome
+FROM clientes c
+LEFT JOIN vendas v ON c.id_cliente = v.id_cliente
+WHERE v.id_venda IS NULL;
+
+
+-- Total gasto por cliente:
+SELECT c.nome, SUM(v.valor_total) AS total
+FROM clientes c
+JOIN vendas v ON c.id_cliente = v.id_cliente
+GROUP BY c.nome;
+
+
+--Ticket médio
+SELECT AVG(valor_total) FROM vendas;
+
+
+-- Total por categoria de produto:
+SELECT p.categoria, SUM(iv.quantidade * iv.valor_unitario) AS total
+FROM itens_venda iv
+JOIN produtos p ON iv.id_produto = p.id_produto
+GROUP BY p.categoria;
+
+
+-- Top clientes:
+SELECT c.nome, SUM(v.valor_total) AS total
+FROM clientes c
+JOIN vendas v ON c.id_cliente = v.id_cliente
+GROUP BY c.nome
+ORDER BY total DESC
+LIMIT 3;
+
+
+-- Clientes que não compram DESDE JULHO DE 2024:
+SELECT c.nome, MAX(v.data_venda) AS ultima_compra
+FROM clientes c
+JOIN vendas v ON c.id_cliente = v.id_cliente
+GROUP BY c.nome
+HAVING MAX(v.data_venda) < '2024-07-01';
+
+
+-- Origem de leads que mais converte
+SELECT origem, COUNT(*) AS total
+FROM leads
+WHERE convertido = TRUE
+GROUP BY origem;
+
+
+-- Clientes com muitas interações
+SELECT c.nome, COUNT(i.id_interacao) AS total_interacoes
+FROM clientes c
+JOIN interacoes i ON c.id_cliente = i.id_cliente
+GROUP BY c.nome
+HAVING COUNT(i.id_interacao) > 1;
+
+
+-- Taxa de conversão de leads:
+SELECT
+    COUNT(CASE WHEN convertido = TRUE THEN 1 END) * 1.0 / COUNT(*) AS taxa
+FROM leads;
