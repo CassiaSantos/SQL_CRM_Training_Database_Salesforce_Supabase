@@ -1,3 +1,4 @@
+-- Criação do banco, inserção de dados e consultas SQL na ferramenta Supabase:
 -- CRIAÇÃO DAS TABELAS
 
 -- CLIENTES
