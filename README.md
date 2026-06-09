@@ -2,11 +2,12 @@
 
 ## 📖 Sobre o Projeto
 
-Este repositório contém os scripts SQL utilizados para criação, povoamento e consulta de uma base de dados simulada de CRM (Customer Relationship Management) bem simples.
+Este repositório contém os scripts SQL utilizados para criação, povoamento e consulta de um bases de dados simuladas de CRM (Customer Relationship Management).
 
-O projeto foi desenvolvido como parte de meus estudos no **Plano de Desenvolvimento Individual (PDI) 2026.1 da Just a Little Data**, com o objetivo de consolidar conhecimentos em bancos de dados relacionais e linguagem SQL aplicados a cenários de negócio reais.
+O projeto foi desenvolvido originalmente como parte de meus estudos no **Plano de Desenvolvimento Individual (PDI) 2026.1 da Just a Little Data**, com o objetivo de consolidar conhecimentos em bancos de dados relacionais e na linguagem SQL aplicados a cenários de negócio reais. 
 
-A base de dados foi modelada para representar um ambiente simplificado de CRM, contemplando processos de aquisição de leads, cadastro de clientes, vendas, produtos, interações com clientes e equipes comerciais.
+### 🔄 Evolução Multiplataforma (Supabase & Salesforce Marketing Cloud)
+O projeto evoluiu de uma estrutura de banco relacional tradicional executada no **Supabase** para uma implementação focada em **Data Extensions do Salesforce Marketing Cloud**.
 
 ---
 
@@ -14,243 +15,75 @@ A base de dados foi modelada para representar um ambiente simplificado de CRM, c
 
 Este projeto foi criado para apoiar o estudo e a prática dos seguintes conceitos:
 
-* Modelagem de bancos de dados relacionais
-* Chaves primárias e estrangeiras
-* Relacionamentos entre tabelas
-* Comandos SQL básicos e intermediários
-* Consultas utilizando:
-
-  * `SELECT`
-  * `WHERE`
-  * `JOIN`
-  * `GROUP BY`
-  * `ORDER BY`
-  * `HAVING`
-  * Funções de agregação (`SUM`, `AVG`, `COUNT`, `MAX`)
+* Modelagem de bancos de dados relacionais e Data Extensions.
+* Relacionamentos entre tabelas via chaves primárias e estrangeiras.
+* Resolução de conflitos de validação de código.
+* Consultas utilizando: `SELECT`, `WHERE`, `JOIN`, `GROUP BY`, `ORDER BY` e Funções de Agregação (`SUM`, `AVG`, `COUNT`).
 
 ---
 
-## 🏗️ Estrutura do Banco de Dados
+## 🏗️ Estrutura do Banco de Dados no Salesforce Marketing Cloud
 
-O banco de dados é composto pelas seguintes entidades:
+Para a implementação no Salesforce Marketing Cloud, as tabelas foram nomeadas seguindo o padrão `tb_[nome]_cassia`. Abaixo está o mapeamento das entidades populadas com dados atuais de 2026:
 
-### 👤 Clientes (`tb_clientes`)
+### 👤 Clientes (`tb_clientes_cassia`)
+Armazena informações cadastrais de 100 clientes integrados.
+* `id_cliente` (Text - PK) | `nome_cliente` (Text) | `cidade_cliente` (Text) | `estado_cliente` (Text) | `email_cliente` (EmailAddress) | `telefone_cliente` (Phone) | `data_cadastro_cliente` (Date)
 
-Armazena informações cadastrais dos clientes.
+### 🧲 Leads (`tb_leads_cassia`)
+Registra os 300 leads captados ao longo do primeiro semestre de 2026.
+* `id_lead` (Text - PK) | `nome_lead` (Text) | `email_lead` (EmailAddress) | `origem_lead` (Text) | `campanha_lead` (Text) | `data_entrada_lead` (Date) | `convertido_lead` (Boolean)
 
-| Campo         | Descrição           |
-| ------------- | ------------------- |
-| id_cliente    | Identificador único |
-| nome          | Nome do cliente     |
-| email         | E-mail              |
-| telefone      | Telefone            |
-| cidade        | Cidade              |
-| estado        | Estado              |
-| data_cadastro | Data de cadastro    |
+### 👥 Vendedores (`tb_vendedores_cassia`)
+Cadastro dos 15 vendedores/closers divididos por equipes de alta performance.
+* `id_vendedor` (Text - PK) | `nome_vendedor` (Text) | `equipe_vendedor` (Text)
 
----
+### 📦 Produtos (`tb_produtos_cassia`)
+Catálogo de produtos da EdTech com foco em High-Ticket.
+* `id_produto` (Text - PK) | `nome_produto` (Text) | `categoria_produto` (Text) | `preco_produto` (Decimal)
 
-### 🧲 Leads (`tb_leads`)
+### 💰 Vendas (`tb_vendas_cassia`)
+Transações financeiras geradas a partir das conversões de leads.
+* `id_venda` (Text - PK) | `id_cliente` (Text) | `id_vendedor` (Text) | `data_venda` (Date) | `valor_total` (Decimal)
 
-Armazena informações dos potenciais clientes captados por campanhas de marketing.
+### 🧾 Itens da Venda (`tb_itens_venda_cassia`)
+O detalhamento de cada produto que compõe os contratos de mentoria.
+* `id_item` (Text - PK) | `id_venda` (Text) | `id_produto` (Text) | `valor_unitario_produto` (Decimal) | `quantidade_prduto` (Number)
 
-| Campo        | Descrição                 |
-| ------------ | ------------------------- |
-| id_lead      | Identificador único       |
-| email        | E-mail do lead            |
-| origem       | Canal de aquisição        |
-| campanha     | Campanha associada        |
-| data_entrada | Data de entrada           |
-| convertido   | Indica se houve conversão |
-
----
-
-### 👥 Vendedores (`tb_vendedores`)
-
-Representa os colaboradores responsáveis pelas vendas.
-
-| Campo       | Descrição           |
-| ----------- | ------------------- |
-| id_vendedor | Identificador único |
-| nome        | Nome do vendedor    |
-| equipe      | Equipe comercial    |
+### 📞 Interações (`tb_interacoes_cassia`)
+Histórico de pontos de contato (WhatsApp, Reuniões de Diagnóstico) controlados pelo CRM.
+* `id_interacao` (Text - PK) | `id_cliente` (Text) | `tipo_interacao` (Text) | `data_interacao` (Date) | `descricao_interacao` (Text)
 
 ---
 
-### 📦 Produtos (`tb_produtos`)
+## 🛠️ Desafios Técnicos e Aprendizados no Salesforce Marketing Cloud
 
-Catálogo de produtos e serviços comercializados.
+Durante a migração dos scripts do Supabase (PostgreSQL) para o Salesforce Marketing Cloud (T-SQL), foram enfrentadas algumas dificuldades de validação nas Query Activities. Abaixo estão documentados os aprendizados fundamentais deste projeto:
 
-| Campo      | Descrição           |
-| ---------- | ------------------- |
-| id_produto | Identificador único |
-| nome       | Nome do produto     |
-| categoria  | Categoria           |
-| preco      | Preço               |
+### 1. O Falso Positivo do Bloco `SELECT *` (Bug do Asterisco)
+O validador do Salesforce possui uma segurança Regex agressiva que proíbe o uso de asteriscos para evitar `SELECT *`. Contudo, o validador disparava um alarme falso ao ler uma multiplicação matemática comum em funções agregadas, como `SUM(quantidade * valor)`.
+* **Solução Técnica Descoberta:** Remover totalmente os espaços em branco antes e depois do caractere de multiplicação (`*`). A sintaxe colada `SUM((iv.quantidade_prduto*iv.valor_unitario_produto))` quebra o padrão do robô do Salesforce e permite salvar a query com sucesso.
 
----
+### 2. Máscara Booleana em Queries
+Embora uma Data Extension aceite a criação de campos do tipo `Boolean`, o motor subjacente do Salesforce expõe esse dado como texto para as Query Activities.
+* **Solução Técnica Descoberta:** Filtros de validação precisam tratar o campo explicitamente com aspas simples (`WHERE convertido_lead = 'TRUE'`), caso contrário, o sistema interpreta o comando como uma coluna inexistente.
 
-### 💰 Vendas (`tb_vendas`)
-
-Registra as transações realizadas pelos clientes.
-
-| Campo       | Descrição            |
-| ----------- | -------------------- |
-| id_venda    | Identificador único  |
-| id_cliente  | Cliente comprador    |
-| id_vendedor | Vendedor responsável |
-| data_venda  | Data da venda        |
-| valor_total | Valor total da venda |
+### 3. Comentários no código SQL apontava erros em outras linhas:
+Levei bastante tempo até perceber que vários erros aparentemente "sem explicação" estava sendo gerados pela linha 1 de comentário do que a consulta retornava. Testei várias vezes as consultas, mudei a forma de consultar para outras alternativas que geravam o mesmo resultado mas até então não conseguia realizar as consultas sem o SQL Studio apontar um erro.
+* **Solução Técnica Descoberta:** Remoção de todo e qualquer comentário nas consultas feitas após esse entendimento.
 
 ---
 
-### 🧾 Itens da Venda (`tb_itens_venda`)
+## 🚀 Imagens do projeto desenvolvido:
 
-Detalhamento dos produtos vendidos em cada venda.
+### 1. Consulta da origem de leads que mais converte
+![Consulta da origem de leads que mais converte](img/origem%20de%20leads%20que%20mais%20converte.png)
 
-| Campo          | Descrição           |
-| -------------- | ------------------- |
-| id_item        | Identificador único |
-| id_venda       | Venda relacionada   |
-| id_produto     | Produto vendido     |
-| quantidade     | Quantidade          |
-| valor_unitario | Valor unitário      |
-
----
-
-### 📞 Interações (`tb_interacoes`)
-
-Registra os contatos realizados com os clientes.
-
-| Campo          | Descrição              |
-| -------------- | ---------------------- |
-| id_interacao   | Identificador único    |
-| id_cliente     | Cliente relacionado    |
-| tipo           | Tipo da interação      |
-| data_interacao | Data da interação      |
-| descricao      | Descrição da interação |
-
----
-
-## 🔗 Relacionamentos
-
-O modelo relacional foi construído utilizando chaves estrangeiras para representar os vínculos entre as entidades.
-
-### Principais relacionamentos
-
-* Um cliente pode possuir várias vendas.
-* Um cliente pode possuir várias interações.
-* Um vendedor pode realizar várias vendas.
-* Uma venda pode possuir vários itens.
-* Um produto pode estar presente em vários itens de venda.
-
----
-
-## 📊 Consultas Desenvolvidas
-
-O projeto contempla consultas SQL voltadas para análise de dados de CRM.
-
-### Clientes sem compras
-
-Identifica clientes cadastrados que ainda não realizaram nenhuma compra.
-
----
-
-### Total gasto por cliente
-
-Calcula o valor total gasto por cada cliente.
-
----
-
-### Ticket médio
-
-Calcula o valor médio das vendas realizadas.
-
----
-
-### Total vendido por categoria de produto
-
-Agrupa as vendas por categoria e calcula o faturamento correspondente.
-
----
-
-### Top clientes
-
-Retorna os clientes com maior volume financeiro em compras.
-
----
-
-### Clientes inativos
-
-Identifica clientes que não realizam compras desde uma determinada data.
-
----
-
-### Origem de leads com maior conversão
-
-Permite analisar a eficiência dos canais de aquisição de leads.
-
----
-
-### Clientes com maior engajamento
-
-Identifica clientes que possuem múltiplas interações registradas.
-
----
-
-### Taxa de conversão de leads
-
-Calcula a proporção entre leads captados e leads convertidos em clientes.
-
----
-
-## 🚀 Como Executar
-
-### 1. Criar o banco de dados
-
-Executar os comandos de criação das tabelas.
-
-### 2. Popular a base
-
-Executar os comandos `INSERT INTO`.
-
-### 3. Executar as consultas
-
-Executar as consultas disponibilizadas na seção de análise.
-
-O projeto pode ser executado em bancos compatíveis com SQL relacional, tais como:
-
-* PostgreSQL
-* Supabase
-* MySQL (com pequenas adaptações)
-* SQL Server
-* Oracle Database
-
----
-
-## 📚 Conceitos Trabalhados
-
-Durante o desenvolvimento deste projeto foram estudados e aplicados:
-
-* Banco de Dados Relacional
-* Modelagem de Dados
-* Chaves Primárias e Estrangeiras
-* Relacionamentos
-* SELECT
-* WHERE
-* JOIN
-* LEFT JOIN
-* GROUP BY
-* HAVING
-* ORDER BY
-* LIMIT
-* Funções de Agregação
-* Indicadores de CRM
-* Métricas de Conversão
-* Análise de Clientes
+### 2. Consulta da taxa de conversao de leads
+![Consulta da taxa de conversao de leads](img/taxa%20de%20conversao%20de%20leads.png)
 
 ---
 
 ## 👩‍💻 Autoria
 
-Projeto desenvolvido para fins de estudo e capacitação no contexto do **Plano de Desenvolvimento Individual (PDI) 2026.1** da **Just a Little Data**, com foco na aplicação prática de SQL para análise de dados e cenários de CRM.
+Projeto desenvolvido para fins de estudo, capacitação e superação de desafios técnicos no contexto do **Plano de Desenvolvimento Individual (PDI) 2026.1** da **Just a Little Data**, demonstrando resiliência e adaptação de código SQL entre ambientes de desenvolvimento (Supabase) e ecossistemas corporativos em nuvem (Salesforce).
